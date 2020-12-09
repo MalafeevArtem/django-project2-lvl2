@@ -17,7 +17,7 @@ from vacancies import forms
 
 class RegisterView(View):
     def get(self, request):
-        return render(request, '../register.html', {'form': forms.RegisterForm})
+        return render(request, 'vacancies/authorization/register.html', {'form': forms.RegisterForm})
 
     def post(self, request):
         form = forms.RegisterForm(request.POST)
@@ -27,12 +27,12 @@ class RegisterView(View):
 
             return redirect('/login')
 
-        return render(request, '../register.html', {'form': form})
+        return render(request, 'vacancies/authorization/register.html', {'form': form})
 
 
 class LoginView(View):
     def get(self, request):
-        return render(request, '../login.html', {'form': forms.LoginForm})
+        return render(request, 'vacancies/authorization/login.html', {'form': forms.LoginForm})
 
     def post(self, request):
         username = request.POST.get('login')
@@ -42,6 +42,9 @@ class LoginView(View):
         if user is not None:
             if user.is_active:
                 login(request, user)
+
+            if request.GET.get('next'):
+                return redirect(request.GET.get('next'))
 
             return redirect('/')
 

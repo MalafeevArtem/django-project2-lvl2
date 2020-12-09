@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends '../base.html' %}
 
   {% block content %}
   <main class="container mt-3 pb-5">
@@ -31,7 +31,14 @@
                       <a href="/vacancies/{{ vacancy.id }}" class="mb-1">{{ vacancy.title }}</a>
                       <p class="mb-1">
                         {% load humanize %}
-                        <span class="mr-4">От {{ vacancy.salary_min|intcomma }} до {{ vacancy.salary_max|intcomma }} P</span><a href="#" class="text-info">3 отклика</a>
+                        <span class="mr-4">От {{ vacancy.salary_min|intcomma }} до
+                          {{ vacancy.salary_max|intcomma }} P </span>
+                        {% if vacancy.applications_count %}
+                          <a href="{% url 'myVacancyEdit' vacancy.id %}" class="text-info">
+                            {{ vacancy.applications_count }} отклика</a>
+                        {% else %}
+                          Нет отликов
+                        {% endif %}
                       </p>
                     </div>
                     <div class="col-6 col-lg-4 text-right">

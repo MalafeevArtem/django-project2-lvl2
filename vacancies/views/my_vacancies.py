@@ -22,22 +22,28 @@ class MyVacanciesView(View):
         is_company = models.Company.objects.filter(owner__id=user.id).first()
 
         if is_company is not None:
-            vacancies = models.Vacancy.objects.filter(company__owner__id=user.id)
+            vacancies = models.Vacancy.objects.filter(company__owner__id=user.id).values('id', 'title',
+                                                                                         'salary_min', 'salary_max')
 
             if vacancies.first() is None:
                 messages.add_message(request, messages.INFO, 'У вас пока нет вакансий, но вы можете создать первую!')
 
-                return render(request, '../vacancies-list.html')
+                return render(request, 'vacancies/my_vacancies/vacancies-list.html')
+
+            for vacancy in vacancies:
+                applications_count = models.Application.objects.filter(vacancy_id=vacancy['id']).count()
+
+                vacancy['applications_count'] = applications_count
 
             context = {
                 'vacancies': vacancies
             }
 
-            return render(request, '../vacancies-list.html', context)
+            return render(request, 'vacancies/my_vacancies/vacancies-list.html', context)
 
         messages.add_message(request, messages.INFO, 'Необходимо создать компанию!')
 
-        return render(request, '../company-edit.html', {'form': forms.MyCompanyEditForm()})
+        return redirect('/mycompany/create/')
 
 
 @method_decorator(login_required, name='dispatch')
@@ -46,8 +52,13 @@ class MyVacancyEditView(View):
         user = request.user
         vacancy = models.Vacancy.objects.get(company__owner__id=user.id, id=vacancy_id)
 
-        return render(request, '../vacancies-edit.html', {'form': forms.MyVacancyEditForm(instance=vacancy),
-                                                                 'title': vacancy.title})
+        applications = models.Application.objects.filter(vacancy__id=vacancy_id)
+
+        return render(request, 'vacancies/my_vacancies/vacancies-edit.html', {
+                                    'form': forms.MyVacancyEditForm(instance=vacancy),
+                                    'title': vacancy.title,
+                                    'applications': applications,
+                                    'applications_count': applications.count()})
 
     def post(self, request, vacancy_id):
         user = request.user
@@ -60,19 +71,18 @@ class MyVacancyEditView(View):
             vacancy.company = company
             vacancy.published_at = datetime.date.today()
             form.save()
-
             messages.add_message(request, messages.INFO, 'Изменения успешно сохранены!')
 
             return redirect('/mycompany/vacancies/{0}'.format(vacancy_id))
 
-        return render(request, '../vacancies-edit.html', {'form': form})
+        return render(request, 'vacancies/my_vacancies/vacancies-edit.html', {'form': form})
 
 
 @method_decorator(login_required, name='dispatch')
 class MyVacancyCreateView(View):
     def get(self, request):
 
-        return render(request, '../vacancies-edit.html', {'form': forms.MyVacancyEditForm()})
+        return render(request, 'vacancies/my_vacancies/vacancies-edit.html', {'form': forms.MyVacancyEditForm()})
 
     def post(self, request):
         user = request.user
@@ -90,4 +100,4 @@ class MyVacancyCreateView(View):
 
             return redirect('/mycompany/vacancies/{0}'.format(vacancy_id))
 
-        return render(request, '../vacancies-edit.html', {'form': form})
+        return render(request, 'vacancies/my_vacancies/vacancies-edit.html', {'form': form})

@@ -20,9 +20,10 @@ class MyCompanyEditView(View):
         is_company = models.Company.objects.filter(owner__id=user.id).first()
 
         if is_company is not None:
-            return render(request, '../company-edit.html', {'form': forms.MyCompanyEditForm(instance=is_company)})
-        else:
-            return render(request, '../company-create.html')
+            return render(request, 'vacancies/my_company/company-edit.html',
+                          {'form': forms.MyCompanyEditForm(instance=is_company)})
+
+        return render(request, 'vacancies/my_company/company-create.html')
 
     def post(self, request):
         user = request.user
@@ -31,16 +32,18 @@ class MyCompanyEditView(View):
 
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.INFO, 'Изменения успешно сохранены!')
 
-        messages.add_message(request, messages.INFO, 'Изменения успешно сохранены!')
+            return redirect('/mycompany/')
 
-        return redirect('/mycompany/')
+        return render(request, 'vacancies/my_company/company-edit.html', {'form': form})
 
 
 @method_decorator(login_required, name='dispatch')
 class MyCompanyCreateView(View):
     def get(self, request):
-        return render(request, '../company-edit.html', {'form': forms.MyCompanyEditForm()})
+
+        return render(request, 'vacancies/my_company/company-edit.html', {'form': forms.MyCompanyEditForm()})
 
     def post(self, request):
         user = request.user
@@ -50,7 +53,8 @@ class MyCompanyCreateView(View):
             company = form.save(commit=False)
             company.owner = user
             company.save()
-
             messages.add_message(request, messages.INFO, 'Компания успешно создана!')
 
-        return redirect('/mycompany/')
+            return redirect('/mycompany/')
+
+        return render(request, 'vacancies/my_company/company-edit.html', {'form': form})
