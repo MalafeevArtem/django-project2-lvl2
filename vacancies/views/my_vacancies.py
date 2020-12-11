@@ -87,17 +87,11 @@ class MyVacancyCreateView(View):
     def post(self, request):
         user = request.user
         form = forms.MyVacancyEditForm(request.POST)
-        company = models.Company.objects.get(owner__id=user.id)
 
         if form.is_valid():
-            vacancy = form.save(commit=False)
-            vacancy.company = company
-            vacancy.published_at = datetime.date.today()
-            form.save()
-
-            messages.add_message(request, messages.INFO, 'Вакансия успешно создана!')
-            vacancy_id = form.save().id
-
-            return redirect('/mycompany/vacancies/{0}'.format(vacancy_id))
-
-        return render(request, 'vacancies/my_vacancies/vacancies-edit.html', {'form': form})
+            company = form.save(commit=False)
+            company.owner = models.User.objects.get(id=user.id)
+            company.save()
+            messages.add_message(request, messages.INFO, 'Компания успешно создана')
+            return redirect('/mycompany/')
+        return render(request, 'vacancies/my_company/company-edit.html', {'form': form})
