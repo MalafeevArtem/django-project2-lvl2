@@ -17,33 +17,12 @@ from vacancies import forms, models
 
 class MainView(View):
     def get(self, request):
-        companies = models.Vacancy.objects.values('company__id') \
-            .annotate(count_vacancies=Count('company__id'))
-
-        companies_info = []
-
-        for company in companies:
-            companies_info.append({
-                'company': models.Company.objects.get(id=company['company__id']),
-                'count': company['count_vacancies'],
-            })
-
-        specialties = models.Vacancy.objects.values('specialty__code') \
-            .annotate(count_vacancies=Count('specialty__code'))
-
-        specialties_info = []
-
-        for specialty in specialties:
-            specialties_info.append({
-                'specialty': models.Specialty.objects.get(code=specialty['specialty__code']),
-                'count': specialty['count_vacancies'],
-            })
+        companies = models.Company.objects.all().annotate(count_vacancies=Count('vacancies'))
+        specialties = models.Specialty.objects.all().annotate(count_vacancies=Count('vacancies'))
 
         context = {
-            'specialties': specialties_info,
-
-            'companies': companies_info,
-
+            'specialties': specialties,
+            'companies': companies,
             'random_specialties': random.sample(list(models.Specialty.objects.all()), 4)
         }
 

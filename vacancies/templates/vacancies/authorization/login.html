@@ -23,9 +23,7 @@
           {% if error %}
            <p class="text-muted"><font color="red">{{ error }}</font></p>
           {% endif %}
-
-        <div class="mt-4 text-center"><p>Нет аккаунта? <a href="/register">Зарегистрируйтесь!</a></p></div>
-
+        <div class="mt-4 text-center"><p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь!</a></p></div>
       </div>
     </div>
   </main>

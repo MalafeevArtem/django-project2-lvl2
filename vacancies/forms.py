@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib.auth.models import User
 
-from vacancies.models import Application, Company, Vacancy
+from vacancies.models import Application , Company , Resume , Vacancy
 
 
 class RegisterForm(UserCreationForm):
@@ -118,6 +118,58 @@ class MyVacancyEditForm(forms.ModelForm):
             'description': 'Описание вакансии',
             'salary_min': 'Зарплата от',
             'salary_max': 'Зарплата до',
+        }
+
+
+class MyResumeEditForm(forms.ModelForm):
+    def __init__(self , *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.fields['education'].widget.attrs['rows'] = 2
+        self.fields['experience'].widget.attrs['rows'] = 2
+        self.fields['portfolio'].widget.attrs['rows'] = 1
+
+        self.helper.layout = Layout(
+            Row(
+                Column('name'),
+                Column('surname'),
+            ),
+            Row(
+                Column('status'),
+                Column('salary'),
+            ),
+            Row(
+                Column('specialty'),
+                Column('grade'),
+            ),
+            Row(
+                Column('education'),
+            ),
+            Row(
+                Column('experience'),
+            ),
+            Row(
+                Column('portfolio'),
+            ),
+            ButtonHolder(
+                self.helper.add_input(Submit('submit', 'Сохранить', css_class='btn btn-primary mt-4 mb-2'))
+            )
+        )
+
+    class Meta:
+        model = Resume
+        fields = ['name', 'surname', 'status', 'salary', 'specialty', 'grade', 'education', 'experience', 'portfolio']
+        labels = {
+            'name': 'Имя',
+            'surname': 'Фамилия',
+            'status': 'Готовность к работе',
+            'salary': 'Ожидаемое вознаграждение',
+            'specialty': 'Специализация',
+            'grade': 'Квалификация',
+            'education': 'Образование',
+            'experience': 'Опыт работы',
+            'portfolio': 'Ссылка на портфолио',
         }
 
 

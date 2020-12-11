@@ -10,7 +10,7 @@
       </div>
       <div class="col-12 col-lg-8">
         <section class="pl-3">
-          <a href="#"><img src="{{ vacancy.specialty.picture.url }}" width="80" height="80" alt=""></a>
+          <img src="{{ vacancy.specialty.picture.url }}" width="80" height="80" alt="">
           <div class="d-flex align-items-baseline align-content-baseline">
             <h1 class="h2 mt-4 font-weight-bold" >{{ vacancy.title }}</h1>
             {% load humanize %}
@@ -31,6 +31,8 @@
               {% crispy form %}
 
               {% if messages %}
+
+
                 {% for message in messages %}
 
                 <p class="text-muted"><font color="red">{{ message }}</font></p>
@@ -39,7 +41,7 @@
           </div>
           {% else %}
           <div class="mt-3">
-            <p class="alert alert-info" role="alert"><a href="/login/">Авторизируйтесь</a> в системе, чтобы отозваться на вакансию!</p>
+            <p class="alert alert-info" role="alert"><a href="{% url 'login' %}">Авторизируйтесь</a> в системе, чтобы отозваться на вакансию!</p>
           </div>
           {% endif %}
 
